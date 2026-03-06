@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A54 — Term Test Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0a0a0a;
+  --s1:#111111;
+  --s2:#181818;
+  --s3:#202020;
+  --b1:#2a2a2a;
+  --b2:#333333;
+  --t1:#f2f2f2;
+  --t2:#888888;
+  --t3:#444444;
+  --white:#ffffff;
+
+  /* Subject colours */
+  --ielts:#a78bfa;
+  --chem:#34d399;
+  --eng:#facc15;
+  --bio:#4ade80;
+  --biz:#f472b6;
+  --fm:#818cf8;
+  --cs:#38bdf8;
+  --math:#c084fc;
+  --phys:#fb923c;
+  --econ:#f97316;
+  --acc:#94a3b8;
+}
+
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ── HEADER ── */
+header{
+  height:56px;padding:0 1.5rem;
+  background:var(--s1);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;gap:1rem;
+  position:sticky;top:0;z-index:100;
+}
+.logo{font-size:1.15rem;font-weight:800;letter-spacing:-.04em;color:var(--white)}
+.logo span{color:var(--phys)}
+.hdr-sub{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--t2);
+  letter-spacing:.1em;text-transform:uppercase}
+.sep{width:1px;height:18px;background:var(--b2);flex-shrink:0}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+
+.filter-btn{
+  font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;
+  padding:5px 11px;border-radius:5px;cursor:pointer;transition:all .15s;
+  background:var(--s2);border:1px solid var(--b2);color:var(--t2);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.filter-btn.active{color:var(--white);border-color:var(--b2);background:var(--s3)}
+.filter-btn:hover{border-color:var(--b2);color:var(--t1)}
+
+/* ── XP BAR ── */
+.xp-bar{height:2px;background:var(--b1);position:sticky;top:56px;z-index:99}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--phys),var(--ielts));width:0%;transition:width .8s}
+
+/* ── HERO ── */
+.hero{
+  max-width:900px;margin:0 auto;padding:2rem 1.5rem 1.5rem;
+}
+.hero-label{
+  font-family:'Space Mono',monospace;font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.18em;color:var(--phys);margin-bottom:.6rem;
+}
+.hero-card{
+  background:var(--s1);border:1px solid var(--b2);border-radius:16px;
+  padding:1.75rem 2rem;position:relative;overflow:hidden;
+  display:flex;gap:2rem;align-items:center;flex-wrap:wrap;
+}
+.hero-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(251,146,60,.08),transparent 55%);
+  pointer-events:none;
+}
+.hero-left{flex:1;min-width:200px;position:relative;z-index:1}
+.hero-next-lbl{
+  font-family:'Space Mono',monospace;font-size:.58rem;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--t2);margin-bottom:.5rem;
+}
+.hero-exam-name{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;color:var(--white);line-height:1.1}
+.hero-exam-meta{
+  font-family:'Space Mono',monospace;font-size:.65rem;color:var(--t2);
+  margin-top:.5rem;display:flex;gap:1rem;flex-wrap:wrap;
+}
+.hero-exam-meta span{display:flex;align-items:center;gap:.35rem}
+.hero-topics{
+  margin-top:.75rem;font-size:.78rem;color:var(--t1);opacity:.75;
+  font-style:italic;
+}
+.hero-timer{
+  display:flex;gap:.75rem;flex-shrink:0;position:relative;z-index:1;
+}
+.t-unit{display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:62px}
+.t-num{
+  font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;
+  color:var(--white);background:var(--s2);border:1px solid var(--b2);
+  border-radius:10px;padding:.5rem .6rem;width:100%;text-align:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.5);line-height:1;
+}
+.t-lbl{
+  font-family:'Space Mono',monospace;font-size:.5rem;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--t2);font-weight:700;
+}
+
+/* ── STATS ROW ── */
+.stats-row{
+  max-width:900px;margin:0 auto;padding:0 1.5rem 1.5rem;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;
+}
+.stat-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:10px;
+  padding:.85rem 1rem;text-align:center;
+}
+.stat-num{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--white)}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem}
+
+/* ── TIMELINE ── */
+.timeline{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem;display:flex;flex-direction:column;gap:.5rem}
+
+.day-hdr{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.5rem 0 .25rem;margin-top:.75rem;
+}
+.day-hdr:first-child{margin-top:0}
+.day-date{font-size:.92rem;font-weight:800;color:var(--white)}
+.day-weekday{
+  font-family:'Space Mono',monospace;font-size:.6rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--t2);
+}
+.day-line{flex:1;height:1px;background:var(--b1)}
+.day-badge{
+  font-family:'Space Mono',monospace;font-size:.55rem;
+  padding:2px 8px;border-radius:3px;
+  background:var(--s2);border:1px solid var(--b1);color:var(--t3);
+}
+.day-badge.today{background:rgba(251,146,60,.12);border-color:rgba(251,146,60,.3);color:var(--phys)}
+
+/* Exam card */
+.exam-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:10px;
+  padding:.9rem 1.1rem;display:flex;align-items:center;gap:1rem;
+  transition:border-color .15s,background .15s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.exam-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;
+}
+.exam-card:hover{background:var(--s2);border-color:var(--b2)}
+.exam-card.past{opacity:.3}
+.exam-card.today-card{border-color:var(--b2)}
+
+/* Subject dot + label */
+.exam-subj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.exam-info{flex:1;min-width:0}
+.exam-name{font-size:.9rem;font-weight:700;color:var(--white);letter-spacing:-.01em}
+.exam-meta{
+  display:flex;align-items:center;gap:.85rem;margin-top:.3rem;flex-wrap:wrap;
+}
+.exam-meta-item{
+  font-family:'Space Mono',monospace;font-size:.6rem;color:var(--t2);
+  display:flex;align-items:center;gap:.3rem;
+}
+.exam-topics{
+  font-size:.75rem;color:var(--t2);margin-top:.35rem;
+  padding:.3rem .6rem;background:var(--s2);border-radius:5px;
+  border-left:2px solid var(--b2);line-height:1.5;
+}
+
+/* Right side */
+.exam-right{text-align:right;flex-shrink:0}
+.exam-days{
+  font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;line-height:1;
+}
+.exam-days-lbl{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+.exam-status{
+  font-family:'Space Mono',monospace;font-size:.58rem;
+  padding:3px 8px;border-radius:4px;margin-top:.35rem;display:inline-block;
+}
+.status-upcoming{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.status-today{background:rgba(251,146,60,.15);color:var(--phys);border:1px solid rgba(251,146,60,.3)}
+.status-done{background:rgba(255,255,255,.04);color:var(--t3);border:1px solid var(--b1)}
+
+/* Subject pill filter */
+.subj-filters{
+  max-width:900px;margin:0 auto;padding:0 1.5rem 1rem;
+  display:flex;gap:.4rem;flex-wrap:wrap;
+}
+.subj-pill{
+  font-family:'Space Mono',monospace;font-size:.6rem;
+  padding:4px 10px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--b1);background:var(--s1);color:var(--t2);
+  transition:all .15s;text-transform:uppercase;letter-spacing:.06em;
+}
+.subj-pill:hover{border-color:var(--b2);color:var(--t1)}
+.subj-pill.active{color:#000;font-weight:700}
+
+/* Today highlight dot on timeline */
+.today-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--phys);
+  box-shadow:0 0 6px var(--phys);flex-shrink:0;
+}
+
+/* Empty state */
+.no-exams{
+  text-align:center;padding:3rem 1rem;
+  font-family:'Space Mono',monospace;font-size:.72rem;color:var(--t3);
+}
+
+@media(max-width:600px){
+  .hero-card{flex-direction:column;align-items:flex-start}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .hero-timer{width:100%;justify-content:space-between}
+  .t-unit{flex:1}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">A54<span>·</span>Track</div>
+  <div class="sep"></div>
+  <div class="hdr-sub">Term Test Timetable · Mar 2026</div>
+  <div class="hdr-right">
+    <button class="filter-btn active" id="filterAll" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" id="filterUpcoming" onclick="setFilter('upcoming')">Upcoming</button>
+    <button class="filter-btn" id="filterPast" onclick="setFilter('past')">Past</button>
+  </div>
+</header>
+<div class="xp-bar"><div class="xp-bar-fill" id="progressBar"></div></div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-label">Next Exam</div>
+  <div class="hero-card" id="heroCard">
+    <div class="hero-left">
+      <div class="hero-next-lbl">Coming Up</div>
+      <div class="hero-exam-name" id="heroName">—</div>
+      <div class="hero-exam-meta" id="heroMeta"></div>
+      <div class="hero-topics" id="heroTopics"></div>
+    </div>
+    <div class="hero-timer">
+      <div class="t-unit"><div class="t-num" id="cd-d">--</div><div class="t-lbl">Days</div></div>
+      <div class="t-unit"><div class="t-num" id="cd-h">--</div><div class="t-lbl">Hrs</div></div>
+      <div class="t-unit"><div class="t-num" id="cd-m">--</div><div class="t-lbl">Min</div></div>
+      <div class="t-unit"><div class="t-num" id="cd-s">--</div><div class="t-lbl">Sec</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Subject filters -->
+<div class="subj-filters" id="subjFilters"></div>
+
+<!-- Timeline -->
+<div class="timeline" id="timeline"></div>
+
+<script>
+var SUBJECT_COLORS = {
+  'IELTS':'#a78bfa',
+  'Chemistry':'#34d399',
+  'English':'#facc15',
+  'Biology':'#4ade80',
+  'Business':'#f472b6',
+  'Further Mathematics':'#818cf8',
+  'Computer Science':'#38bdf8',
+  'Mathematics':'#c084fc',
+  'Physics':'#fb923c',
+  'Economics':'#f97316',
+  'Accounting':'#94a3b8',
+};
+
+function subjectColor(name) {
+  for (var key in SUBJECT_COLORS) {
+    if (name.toLowerCase().indexOf(key.toLowerCase()) > -1) return SUBJECT_COLORS[key];
+  }
+  return '#888888';
+}
+
+var EXAMS = [
+  // 6 Mar 2026 (Fri)
+  {date:'2026-03-06', start:'09:30', end:'10:30', subject:'IELTS',              paper:'IELTS',                        duration:'1 hour',       venue:'OC 3-12', topics:'NA'},
+  {date:'2026-03-06', start:'15:00', end:'17:00', subject:'Chemistry',          paper:'Chemistry Paper 3',            duration:'2 hours',      venue:'OC Lab',  topics:'NA'},
+  // 9 Mar 2026 (Mon)
+  {date:'2026-03-09', start:'09:30', end:'11:45', subject:'English',            paper:'English Paper 1',              duration:'2 hrs 15 min', venue:'OC 3-12', topics:'Textual Analysis'},
+  {date:'2026-03-09', start:'13:30', end:'15:30', subject:'English',            paper:'English Paper 2',              duration:'2 hours',      venue:'OC 3-12', topics:'Writing'},
+  // 10 Mar 2026 (Tue)
+  {date:'2026-03-10', start:'09:30', end:'10:45', subject:'Biology',            paper:'Biology Paper 1',              duration:'1 hr 15 mins', venue:'OC 3-12', topics:'All topics'},
+  {date:'2026-03-10', start:'09:30', end:'10:45', subject:'Business',           paper:'Business Paper 1',             duration:'1 hr 15 mins', venue:'OC 3-12', topics:'Topics 1 to 5'},
+  {date:'2026-03-10', start:'09:30', end:'11:30', subject:'Further Mathematics',paper:'Further Mathematics Paper 1',  duration:'2 hours',      venue:'OC 3-12', topics:'All Topics of Paper 1'},
+  {date:'2026-03-10', start:'09:30', end:'11:00', subject:'Computer Science',   paper:'Computer Science Paper 1',     duration:'1 hr 30 mins', venue:'OC 3-14', topics:'All except topic 8 and 9'},
+  {date:'2026-03-10', start:'13:30', end:'14:45', subject:'Biology',            paper:'Biology Paper 2',              duration:'1 hr 15 mins', venue:'OC 3-12', topics:'All topics'},
+  {date:'2026-03-10', start:'13:30', end:'14:45', subject:'Business',           paper:'Business Paper 2',             duration:'1 hr 15 mins', venue:'OC 3-12', topics:'Topics 1 to 5'},
+  {date:'2026-03-10', start:'13:30', end:'15:00', subject:'Further Mathematics',paper:'Further Mathematics Paper 4',  duration:'1 hr 30 mins', venue:'OC 3-12', topics:'All Topics of Paper 4'},
+  {date:'2026-03-10', start:'13:30', end:'15:30', subject:'Computer Science',   paper:'Computer Science Paper 2',     duration:'2 hours',      venue:'OC 3-14', topics:'All topics'},
+  // 11 Mar 2026 (Wed)
+  {date:'2026-03-11', start:'09:30', end:'11:20', subject:'Mathematics',        paper:'Mathematics Paper 1',          duration:'1 hr 50 mins', venue:'OC 3-12', topics:'All topics'},
+  {date:'2026-03-11', start:'13:30', end:'14:45', subject:'Mathematics',        paper:'Mathematics Paper 5',          duration:'1 hr 15 mins', venue:'OC 3-12', topics:'All topics'},
+  // 12 Mar 2026 (Thu)
+  {date:'2026-03-12', start:'09:15', end:'11:15', subject:'Biology',            paper:'Biology Paper 3',              duration:'2 hours',      venue:'OC Lab',  topics:'NA'},
+  {date:'2026-03-12', start:'13:30', end:'14:45', subject:'Physics',            paper:'Physics Paper 1',              duration:'1 hr 15 mins', venue:'OC 3-12', topics:'Topic 1 (Physical Quantities & Units) – Topic 11 (Particle Physics)'},
+  // 13 Mar 2026 (Fri)
+  {date:'2026-03-13', start:'09:30', end:'11:30', subject:'Economics',          paper:'Economics Paper 1',            duration:'1 hr 30 mins', venue:'OC 3-12', topics:'All Topics'},
+  {date:'2026-03-13', start:'09:30', end:'10:45', subject:'Physics',            paper:'Physics Paper 2',              duration:'1 hr 15 mins', venue:'OC 3-12', topics:'Topic 1 (Physical Quantities & Units) – Topic 11 (Particle Physics)'},
+  {date:'2026-03-13', start:'13:30', end:'15:30', subject:'Economics',          paper:'Economics Paper 2',            duration:'2 hours',      venue:'OC 3-12', topics:'All Topics'},
+  // 16 Mar 2026 (Mon)
+  {date:'2026-03-16', start:'09:30', end:'10:30', subject:'Accounting',         paper:'Accounting Paper 1',           duration:'1 hour',       venue:'OC 3-12', topics:'All topics for Paper 1'},
+  {date:'2026-03-16', start:'09:30', end:'10:45', subject:'Chemistry',          paper:'Chemistry Paper 1',            duration:'1 hr 15 mins', venue:'OC 3-12', topics:'All AS Topics'},
+  {date:'2026-03-16', start:'13:30', end:'15:15', subject:'Accounting',         paper:'Accounting Paper 2',           duration:'1 hr 45 mins', venue:'OC 3-12', topics:'All topics for Paper 2'},
+  {date:'2026-03-16', start:'13:30', end:'14:45', subject:'Chemistry',          paper:'Chemistry Paper 2',            duration:'1 hr 15 mins', venue:'OC 3-12', topics:'All AS Topics'},
+  // 26 Mar 2026 (Thu)
+  {date:'2026-03-26', start:'09:30', end:'11:30', subject:'Physics',            paper:'Physics Paper 3 (Group 1)',    duration:'2 hours',      venue:'OC Lab',  topics:'Advanced Practical Skills 1'},
+  {date:'2026-03-26', start:'13:30', end:'15:30', subject:'Physics',            paper:'Physics Paper 3 (Group 2)',    duration:'2 hours',      venue:'OC Lab',  topics:'Advanced Practical Skills 1'},
+];
+
+// Sort by date then start time
+EXAMS.sort(function(a,b){
+  var da = new Date(a.date+'T'+a.start+':00'), db = new Date(b.date+'T'+b.start+':00');
+  return da - db;
+});
+
+var currentFilter = 'all';
+var currentSubject = 'all';
+
+function getExamDT(ex) { return new Date(ex.date + 'T' + ex.start + ':00'); }
+function getExamEndDT(ex) { return new Date(ex.date + 'T' + ex.end + ':00'); }
+
+function isToday(dateStr) {
+  var t = new Date(), d = new Date(dateStr+'T12:00:00');
+  return t.getFullYear()===d.getFullYear() && t.getMonth()===d.getMonth() && t.getDate()===d.getDate();
+}
+
+function isPast(ex) { return getExamEndDT(ex) < new Date(); }
+function isUpcoming(ex) { return getExamDT(ex) > new Date(); }
+function isOngoing(ex) { var n=new Date(); return getExamDT(ex)<=n && getExamEndDT(ex)>=n; }
+
+function daysBetween(dt) {
+  return Math.ceil((dt - new Date()) / 86400000);
+}
+
+function formatDate(dateStr) {
+  var d = new Date(dateStr+'T12:00:00');
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+}
+function weekday(dateStr) {
+  var d = new Date(dateStr+'T12:00:00');
+  return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];
+}
+
+// ── Hero countdown ──
+function updateHero() {
+  var now = new Date();
+  var next = null;
+  for (var i=0; i<EXAMS.length; i++) {
+    if (getExamDT(EXAMS[i]) > now) { next = EXAMS[i]; break; }
+  }
+  if (!next) {
+    document.getElementById('heroName').textContent = 'All exams completed — well done!';
+    document.getElementById('heroMeta').innerHTML = '';
+    document.getElementById('heroTopics').textContent = '';
+    ['cd-d','cd-h','cd-m','cd-s'].forEach(function(id){ document.getElementById(id).textContent='00'; });
+    return;
+  }
+  var color = subjectColor(next.subject);
+  document.getElementById('heroName').textContent = next.paper;
+  document.getElementById('heroMeta').innerHTML =
+    '<span>📅 ' + formatDate(next.date) + '</span>' +
+    '<span>🕐 ' + next.start + '–' + next.end + '</span>' +
+    '<span>⏱ ' + next.duration + '</span>' +
+    '<span>📍 ' + next.venue + '</span>';
+  if (next.topics && next.topics !== 'NA') {
+    document.getElementById('heroTopics').textContent = '📖 ' + next.topics;
+  } else {
+    document.getElementById('heroTopics').textContent = '';
+  }
+  document.getElementById('heroCard').style.borderColor = color;
+
+  var diff = getExamDT(next) - now;
+  if (diff <= 0) diff = 0;
+  document.getElementById('cd-d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+
+// ── Stats ──
+function renderStats() {
+  var total = EXAMS.length;
+  var done = EXAMS.filter(isPast).length;
+  var today = EXAMS.filter(function(e){ return isToday(e.date); }).length;
+  var upcoming = EXAMS.filter(isUpcoming).length;
+  var pct = Math.round(done/total*100);
+
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('statsRow').innerHTML =
+    '<div class="stat-card"><div class="stat-num">' + total + '</div><div class="stat-lbl">Total Exams</div></div>' +
+    '<div class="stat-card"><div class="stat-num" style="color:var(--chem)">' + done + '</div><div class="stat-lbl">Completed</div></div>' +
+    '<div class="stat-card"><div class="stat-num" style="color:var(--phys)">' + upcoming + '</div><div class="stat-lbl">Upcoming</div></div>' +
+    '<div class="stat-card"><div class="stat-num" style="color:var(--ielts)">' + pct + '%</div><div class="stat-lbl">Progress</div></div>';
+}
+
+// ── Subject filter pills ──
+function renderSubjPills() {
+  var subjects = [];
+  EXAMS.forEach(function(e){ if (subjects.indexOf(e.subject)===-1) subjects.push(e.subject); });
+  subjects.sort();
+  var html = '<div class="subj-pill active" id="pill-all" onclick="setSubject(\'all\')" style="border-color:var(--b2);color:var(--t1)">All Subjects</div>';
+  subjects.forEach(function(s) {
+    var c = subjectColor(s);
+    html += '<div class="subj-pill" id="pill-'+s.replace(/\s/g,'_')+'" onclick="setSubject(\''+s+'\')" style="border-color:'+c+'22;color:'+c+'">' + s + '</div>';
+  });
+  document.getElementById('subjFilters').innerHTML = html;
+}
+
+// ── Timeline ──
+function renderTimeline() {
+  var tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+
+  var filtered = EXAMS.filter(function(e) {
+    if (currentSubject !== 'all' && e.subject !== currentSubject) return false;
+    if (currentFilter === 'upcoming') return isUpcoming(e);
+    if (currentFilter === 'past') return isPast(e);
+    return true;
+  });
+
+  if (!filtered.length) {
+    tl.innerHTML = '<div class="no-exams">No exams match this filter.</div>';
+    return;
+  }
+
+  // Group by date
+  var days = [];
+  var dayMap = {};
+  filtered.forEach(function(e) {
+    if (!dayMap[e.date]) { dayMap[e.date]=[]; days.push(e.date); }
+    dayMap[e.date].push(e);
+  });
+
+  days.forEach(function(date) {
+    // Day header
+    var hdr = document.createElement('div');
+    hdr.className = 'day-hdr';
+    var todayDay = isToday(date);
+    hdr.innerHTML =
+      (todayDay ? '<div class="today-dot"></div>' : '') +
+      '<div class="day-date">' + formatDate(date) + '</div>' +
+      '<div class="day-weekday">' + weekday(date) + '</div>' +
+      '<div class="day-line"></div>' +
+      '<div class="day-badge' + (todayDay?' today':'') + '">' + (todayDay?'TODAY':dayMap[date].length+' exam'+(dayMap[date].length>1?'s':'')) + '</div>';
+    tl.appendChild(hdr);
+
+    dayMap[date].forEach(function(ex) {
+      var card = document.createElement('div');
+      var past = isPast(ex);
+      var today = isOngoing(ex);
+      var color = subjectColor(ex.subject);
+      card.className = 'exam-card' + (past?' past':'') + (today?' today-card':'');
+      card.style.setProperty('--accent', color);
+
+      // Left accent bar color
+      var before = document.createElement('style');
+      var uid = 'card-'+Math.random().toString(36).slice(2,7);
+      card.classList.add(uid);
+      before.textContent = '.'+uid+'::before{background:'+color+'}';
+      document.head.appendChild(before);
+
+      var daysLeft = Math.ceil((getExamDT(ex)-new Date())/86400000);
+      var statusHtml = '';
+      if (past) {
+        statusHtml = '<div class="exam-status status-done">Done</div>';
+      } else if (today) {
+        statusHtml = '<div class="exam-status status-today">Now</div>';
+      } else {
+        statusHtml = '<div class="exam-status status-upcoming">In '+daysLeft+'d</div>';
+      }
+
+      card.innerHTML =
+        '<div class="exam-subj-dot" style="background:'+color+';box-shadow:0 0 6px '+color+'"></div>' +
+        '<div class="exam-info">' +
+          '<div class="exam-name">' + ex.paper + '</div>' +
+          '<div class="exam-meta">' +
+            '<div class="exam-meta-item">🕐 ' + ex.start + '–' + ex.end + '</div>' +
+            '<div class="exam-meta-item">⏱ ' + ex.duration + '</div>' +
+            '<div class="exam-meta-item">📍 ' + ex.venue + '</div>' +
+          '</div>' +
+          (ex.topics && ex.topics!=='NA' ? '<div class="exam-topics">📖 ' + ex.topics + '</div>' : '') +
+        '</div>' +
+        '<div class="exam-right">' +
+          (past
+            ? '<div class="exam-days" style="color:var(--t3)">✓</div>'
+            : '<div class="exam-days" style="color:'+color+'">'+daysLeft+'</div><div class="exam-days-lbl">days left</div>'
+          ) +
+          statusHtml +
+        '</div>';
+
+      tl.appendChild(card);
+    });
+  });
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  ['all','upcoming','past'].forEach(function(x){
+    document.getElementById('filter'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active', x===f);
+  });
+  renderTimeline();
+}
+
+function setSubject(s) {
+  currentSubject = s;
+  document.querySelectorAll('.subj-pill').forEach(function(p){ p.classList.remove('active'); });
+  var target = document.getElementById('pill-'+(s==='all'?'all':s.replace(/\s/g,'_')));
+  if (target) target.classList.add('active');
+  renderTimeline();
+}
+
+// Init
+renderStats();
+renderSubjPills();
+renderTimeline();
+updateHero();
+setInterval(updateHero, 1000);
+</script>
+</body>
+</html>
